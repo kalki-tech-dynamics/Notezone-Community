@@ -25,7 +25,7 @@ const Community = () => {
                 setTimeout(() => {
                     localStorage.removeItem("noteuser");
                     window.location.href = "https://notezone.in/login";
-                }, 10000);
+                }, 1000000);
             } finally {
                 setLoading(false);
             }
