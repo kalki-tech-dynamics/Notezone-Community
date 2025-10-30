@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { FaUsers, FaTag, FaAlignLeft } from 'react-icons/fa';
+import BASE_URL from "../Services/Base_URL.jsx";
+const API_BASE = BASE_URL;
 
 const CreateGroup = ({ onCreated, apiBase }) => {
   const [name, setName] = useState('');
@@ -13,7 +15,7 @@ const CreateGroup = ({ onCreated, apiBase }) => {
          useEffect(() => {
              const fetchUser = async () => {
                  try {
-                     const res = await fetch(`${BASE_URL}/decode`, {
+                     const res = await fetch(`https://api.notezone.in/api/jwt-decode`, {
                          method: "GET",
                          credentials: "include",
                      });
@@ -38,13 +40,13 @@ const CreateGroup = ({ onCreated, apiBase }) => {
      
   
          
-  
-         const [user_id, setuser_id] = useState(user?.id || "guest-id");
+  const noteuser = JSON.parse(localStorage.getItem("noteuser"));
+         const [user_id, setuser_id] = useState(noteuser?.id);
 
   async function handleCreate(e) {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch(`${apiBase}/groups`, {
+    const res = await fetch(`${API_BASE}/groups`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-id': user_id },
       body: JSON.stringify({ name, description, topic })

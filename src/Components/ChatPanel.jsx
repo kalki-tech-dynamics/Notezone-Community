@@ -1,58 +1,47 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FaPaperPlane, FaTimes } from 'react-icons/fa';
+import BASE_URL from "../Services/Base_URL.jsx";
+const API_BASE = BASE_URL;
+
 const ChatPanel=({ group, onClose, apiBase })=> {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const pollRef = useRef(null);
- const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await fetch(`${BASE_URL}/decode`, {
-                    method: "GET",
-                    credentials: "include",
-                });
-
-                const data = await res.json();
-
-                if (res.ok && data.noteuser) {
-                    setUser(data.noteuser);
-                    localStorage.setItem("noteuser", JSON.stringify(data.noteuser));
-                } 
-            } catch (err) {
-                console.error(err);
-                setTimeout(() => {
-                    localStorage.removeItem("noteuser");
-                    window.location.href = "https://notezone.in/login";
-                }, 1000000);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, []);
-
-        const [user_id, setuser_id] = useState(user?.id || "guest-id");
-
-  useEffect(() => {
-    fetchAllGroups();
-    fetchJoinedGroups();
-  }, [refresh]);
-
-  async function fetchAllGroups() {
-    const res = await fetch(`${API_BASE}/groups`);
-    const json = await res.json();
-    setAllGroups(json.groups || []);
-  }
-
-  useEffect(() => {
-  fetchAllGroups();
-  fetchJoinedGroups();
-}, []);
+  
+     const [user, setUser] = useState(null);
+     
+         useEffect(() => {
+             const fetchUser = async () => {
+                 try {
+                     const res = await fetch(`https://api.notezone.in/api/jwt-decode`,{
+                         method: "GET",
+                         credentials: "include",
+                     });
+     
+                     const data = await res.json();
+     
+                     if (res.ok && data.noteuser) {
+                         setUser(data.noteuser);
+                         localStorage.setItem("noteuser", JSON.stringify(data.noteuser));
+                     } 
+                 } catch (err) {
+                     console.error(err);
+                     setTimeout(() => {
+                         localStorage.removeItem("noteuser");
+                         window.location.href = "https://notezone.in/login";
+                     }, 1000000);
+                 }
+             };
+     
+             fetchUser();
+         }, []);
+     
+  
+         
+  const noteuser = JSON.parse(localStorage.getItem("noteuser"));
+         const [user_id, setuser_id] = useState(noteuser?.id);
 
 
   useEffect(() => {
@@ -64,7 +53,7 @@ const ChatPanel=({ group, onClose, apiBase })=> {
   }, [group]);
 
   async function fetchMessages() {
-    const res = await fetch(`${apiBase}/groups/${group.id}/messages?limit=200`);
+    const res = await fetch(`${API_BASE}/groups/${group.id}/messages?limit=200`);
     if (!res.ok) return;
     const json = await res.json();
     setMessages(json.messages || []);
@@ -73,7 +62,7 @@ const ChatPanel=({ group, onClose, apiBase })=> {
   async function sendMessage(e) {
     e.preventDefault();
     if (!text.trim()) return;
-    const res = await fetch(`${apiBase}/groups/${group.id}/messages`, {
+    const res = await fetch(`${API_BASE}/groups/${group.id}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-id': user_id },
       body: JSON.stringify({ content: text })

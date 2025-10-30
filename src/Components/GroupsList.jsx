@@ -1,18 +1,19 @@
 import { FaUsers, FaRegCalendarAlt } from 'react-icons/fa';
-import React from 'react';
+import React, { useEffect,useState } from 'react';
+import BASE_URL from "../Services/Base_URL.jsx";
+const API_BASE = BASE_URL;
 
-export default function GroupsList({ groups, onOpen, apiBase, joinedGroupsIds }) {
+const GroupsList =({ groups, onOpen, apiBase, joinedGroupsIds }) => {
   if (!groups || groups.length === 0) return <div className="empty">No groups found</div>;
 
   const isMember = (groupId) => joinedGroupsIds?.includes(groupId);
-  // const user_id = localStorage.getItem('user_id');
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchUser = async () => {
+  useEffect(() => {
+    const fetchUser = async () => {
             try {
-                const res = await fetch(`${BASE_URL}/decode`, {
+                const res = await fetch(`https://api.notezone.in/api/jwt-decode`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -22,25 +23,27 @@ export default function GroupsList({ groups, onOpen, apiBase, joinedGroupsIds })
                 if (res.ok && data.noteuser) {
                     setUser(data.noteuser);
                     localStorage.setItem("noteuser", JSON.stringify(data.noteuser));
-                } 
-            } catch (err) {
-                console.error(err);
-                setTimeout(() => {
+                  } 
+                } catch (err) {
+                  console.error(err);
+                  setTimeout(() => {
                     localStorage.removeItem("noteuser");
                     window.location.href = "https://notezone.in/login";
-                }, 1000000);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
-    }, []);
-    
- const [user_id, setuser_id] = useState(user?.id || "guest-id");
+                  }, 1000000);
+                } finally {
+                  setLoading(false);
+                }
+              };
+              
+              fetchUser();
+            }, []);
+            
+              const noteuser = JSON.parse(localStorage.getItem("noteuser"));
+              const [user_id, setuser_id] = useState(noteuser?.id);
+            
 
   async function joinGroup(id) {
-    const res = await fetch(`${apiBase}/groups/${id}/join`, {
+    const res = await fetch(`${API_BASE}/groups/${id}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-id': user_id },
     });
@@ -54,7 +57,7 @@ export default function GroupsList({ groups, onOpen, apiBase, joinedGroupsIds })
   }
 
   async function leaveGroup(id) {
-    const res = await fetch(`${apiBase}/groups/${id}/leave`, {
+    const res = await fetch(`${API_BASE}/groups/${id}/leave`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-user-id': user_id },
     });
@@ -93,3 +96,5 @@ export default function GroupsList({ groups, onOpen, apiBase, joinedGroupsIds })
 
   );
 }
+
+export default GroupsList;

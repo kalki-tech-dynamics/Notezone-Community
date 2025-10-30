@@ -54,9 +54,9 @@ import CreateGroup from './CreateGroup';
 import GroupsList from './GroupsList';
 import ChatPanel from './ChatPanel';
 import './community.css';
-import BASE_URL from "../Services/Base_URL.jsx";
 import './c.css'
 
+import BASE_URL from "../Services/Base_URL.jsx";
 const API_BASE = BASE_URL;
 
 const Community=()=> {
@@ -72,7 +72,7 @@ const Community=()=> {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await fetch(`${BASE_URL}/decode`, {
+                const res = await fetch(`https://api.notezone.in/api/jwt-decode`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -96,8 +96,8 @@ const Community=()=> {
 
         fetchUser();
     }, []);
-    
-    const [user_id, setuser_id] = useState(user?.id || "guest-id");
+    const noteuser = JSON.parse(localStorage.getItem("noteuser"));
+    const [user_id, setuser_id] = useState(noteuser?.id);
     
   useEffect(() => {
     fetchAllGroups();
