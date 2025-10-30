@@ -3,7 +3,7 @@ import { FaUsers, FaTag, FaAlignLeft } from 'react-icons/fa';
 import BASE_URL from "../Services/Base_URL.jsx";
 const API_BASE = BASE_URL;
 
-const CreateGroup = ({ onCreated }) => {
+const CreateGroup = ({ onCreated, apiBase }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [topic, setTopic] = useState('');
